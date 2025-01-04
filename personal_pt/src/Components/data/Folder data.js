@@ -1,21 +1,21 @@
 const explorer = {
-    id: 1641415406000,
+    id: 1,
     name: "Root",
     isFolder: true,
     items: [
         {
-            id: 1641415410000,
+            id: 2,
             name: "Documents",
             isFolder: true,
             items: [
                 {
-                    id: 1641415412000,
+                    id: 3,
                     name: "Images",
                     isFolder: true,
                     items: []
                 },
                 {
-                    id: 1641415414000,
+                    id: 4,
                     name: "photo.jpg",
                     isFolder: false,
                     items: null
@@ -23,7 +23,7 @@ const explorer = {
             ]
         },
         {
-            id: 1641415416000,
+            id: 5,
             name: "file.txt",
             isFolder: false,
             items: null
