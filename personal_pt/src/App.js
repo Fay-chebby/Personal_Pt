@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Folder from "./components/Folder";
-//import useTraverseTree from "./hooks/use-traverse-tree";
+import Folder from "./Components/Folder";
+import useTraverseTree from "./Hook/use-traverse-tree";
 //import "./styles.css";
 import explorer from "./Components/data/Folder data"
 
