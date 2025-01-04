@@ -1,12 +1,24 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import Folder from "./components/Folder";
+import useTraverseTree from "./hooks/use-traverse-tree";
+import "./styles.css";
+import explorer from "./Components/data/Folder"
 
-function App() {
+export default function App() {
+  const [explorerData, setExplorerData] = useState(explorer);
+
+  const { insertNode } = useTraverseTree();
+
+  const handleInsertNode = (folderId, item, isFolder) => {
+    const finalTree = insertNode(explorerData, folderId, item, isFolder);
+    setExplorerData(finalTree);
+  };
+
   return (
-    <div className="App">
-
-    </div>
+      <div className="App">
+        <Folder handleInsertNode={handleInsertNode} explorer={explorerData} />
+      </div>
   );
 }
 
-export default App;
+// fix connect script in latest video
