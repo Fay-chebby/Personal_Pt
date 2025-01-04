@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Folder from "./components/Folder";
-import useTraverseTree from "./hooks/use-traverse-tree";
-import "./styles.css";
-import explorer from "./Components/data/Folder"
+//import useTraverseTree from "./hooks/use-traverse-tree";
+//import "./styles.css";
+import explorer from "./Components/data/Folder data"
 
 export default function App() {
   const [explorerData, setExplorerData] = useState(explorer);
