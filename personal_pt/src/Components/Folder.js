@@ -1,181 +1,123 @@
-import React, { useState } from "react";
-import explorer from "./data/Folder data";
+import { useState } from "react";
 
-function FileUploader() {
-    const [fileStructure, setFileStructure] = useState(explorer);
+function Folder({ handleInsertNode = () => {}, explorer }) {
+    const [expand, setExpand] = useState(false);
+    const [showInput, setShowInput] = useState({
+        visible: false,
+        isFolder: false,
+    });
 
-    // Function to add a new folder
-    const addFolder = () => {
-        const folderName = prompt("Enter folder name:");
-        if (folderName) {
-            const newFolder = {
-                id: Date.now() + Math.random(),
-                name: folderName,
-                isFolder: true,
-                items: [],
-            };
+    const handleNewFolder = (e, isFolder) => {
+        e.stopPropagation();
+        setExpand(true);
+        setShowInput({
+            visible: true,
+            isFolder,
+        });
+    };
 
-            setFileStructure((prevStructure) => ({
-                ...prevStructure,
-                items: [...prevStructure.items, newFolder],
-            }));
+    const onAddFolder = (e) => {
+        if (e.keyCode === 13 && e.target.value) {
+            handleInsertNode(explorer.id, e.target.value, showInput.isFolder);
+            setShowInput({ ...showInput, visible: false });
         }
     };
 
-    // Handle file uploads
-    const handleFileUpload = (event) => {
-        const files = Array.from(event.target.files);
-        const newItems = files.map((file) => ({
-            id: Date.now() + Math.random(),
-            name: file.name,
-            isFolder: false,
-            items: null,
-        }));
-
-        setFileStructure((prevStructure) => ({
-            ...prevStructure,
-            items: [...prevStructure.items, ...newItems],
-        }));
-    };
-
-    // Handle folder uploads
-    const handleFolderUpload = (event) => {
-        const files = Array.from(event.target.files);
-        const folderItems = {};
-
-        // Group files by folder structure
+    // Handle File or Folder Selection
+    const handleFileUpload = (e) => {
+        const files = Array.from(e.target.files);
         files.forEach((file) => {
-            const folderPath = file.webkitRelativePath.split("/").slice(0, -1).join("/");
-            if (!folderItems[folderPath]) {
-                folderItems[folderPath] = [];
-            }
-            folderItems[folderPath].push({
-                id: Date.now() + Math.random(),
-                name: file.name,
-                isFolder: false,
-                items: null,
-            });
+            const isFolder = file.webkitRelativePath && file.webkitRelativePath.includes("/");
+            const name = isFolder ? file.webkitRelativePath.split("/")[0] : file.name;
+
+            handleInsertNode(explorer.id, name, isFolder);
         });
+    };
 
-        // Create folder hierarchy
-        const createHierarchy = (path, items) => {
-            if (path.length === 0) return items;
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setExpand(true);
 
-            const folderName = path.shift();
-            return [
-                {
-                    id: Date.now() + Math.random(),
-                    name: folderName,
-                    isFolder: true,
-                    items: createHierarchy(path, items),
-                },
-            ];
-        };
+        const files = Array.from(e.dataTransfer.files);
+        files.forEach((file) => {
+            const isFolder = file.webkitRelativePath && file.webkitRelativePath.includes("/");
+            const name = isFolder ? file.webkitRelativePath.split("/")[0] : file.name;
 
-        const newFolders = Object.entries(folderItems).map(([folderPath, files]) => {
-            const pathParts = folderPath.split("/");
-            return createHierarchy(pathParts, files);
+            handleInsertNode(explorer.id, name, isFolder);
         });
-
-        setFileStructure((prevStructure) => ({
-            ...prevStructure,
-            items: [...prevStructure.items, ...newFolders.flat()],
-        }));
     };
 
-    const handleDrop = (event) => {
-        event.preventDefault();
-        const files = Array.from(event.dataTransfer.files);
-        const newItems = files.map((file) => ({
-            id: Date.now() + Math.random(),
-            name: file.name,
-            isFolder: false,
-            items: null,
-        }));
-
-        setFileStructure((prevStructure) => ({
-            ...prevStructure,
-            items: [...prevStructure.items, ...newItems],
-        }));
+    const handleDragOver = (e) => {
+        e.preventDefault();
     };
 
-    const handleDragOver = (event) => {
-        event.preventDefault();
-    };
-
-    const renderFileStructure = (items) => {
+    const renderFolder = (explorer) => {
         return (
-            <ul>
-                {items.map((item) => (
-                    <li key={item.id}>
-                        {item.isFolder ? (
-                            <>
-                                <strong>{item.name}</strong>
-                                {item.items && item.items.length > 0 && renderFileStructure(item.items)}
-                            </>
-                        ) : (
-                            <span>{item.name}</span>
-                        )}
-                    </li>
-                ))}
-            </ul>
+            <div style={{ marginTop: 5 }}>
+                <div
+                    onClick={() => setExpand(!expand)}
+                    className="folder"
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                >
+                    <span>📁 {explorer.name}</span>
+
+                    <div>
+                        <button onClick={(e) => handleNewFolder(e, true)}>Folder +</button>
+                        <button onClick={(e) => handleNewFolder(e, false)}>File +</button>
+
+                        {/* Open file or folder picker */}
+                        <label>
+                            Upload File
+                            <input
+                                type="file"
+                                multiple
+                                onChange={handleFileUpload}
+                                style={{ display: "none" }}
+                            />
+                        </label>
+                        <label>
+                            Upload Folder
+                            <input
+                                type="file"
+                                webkitdirectory="true"
+                                onChange={handleFileUpload}
+                                style={{ display: "none" }}
+                            />
+                        </label>
+                    </div>
+                </div>
+
+                <div style={{ display: expand ? "block" : "none", paddingLeft: 25 }}>
+                    {showInput.visible && (
+                        <div className="inputContainer">
+                            <span>{showInput.isFolder ? "📁" : "📄"}</span>
+                            <input
+                                type="text"
+                                className="inputContainer__input"
+                                autoFocus
+                                onKeyDown={onAddFolder}
+                                onBlur={() => setShowInput({ ...showInput, visible: false })}
+                            />
+                        </div>
+                    )}
+
+                    {/* Safeguard: Default to empty array if `items` is null */}
+                    {(explorer.items || []).map((exp) => {
+                        return (
+                            <Folder
+                                handleInsertNode={handleInsertNode}
+                                key={exp.id}
+                                explorer={exp}
+                            />
+                        );
+                    })}
+                </div>
+            </div>
         );
     };
 
-    return (
-        <div className="file-uploader-container">
-            {/* Folder Creation */}
-            <button onClick={addFolder}>Add Folder</button>
-
-            {/* Drag-and-Drop Upload Section */}
-            <div
-                className="upload-box"
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-            >
-                <p className="upload-title">Upload your files or folders</p>
-                <div className="drop-area">
-                    {/* Upload File */}
-                    <label htmlFor="file-upload" className="drop-label">
-                        <div className="folder-icon"></div>
-                        <p>Drag & Drop your files here</p>
-                        <p>or click to upload files</p>
-                    </label>
-                    <input
-                        id="file-upload"
-                        type="file"
-                        className="file-input"
-                        multiple
-                        onChange={handleFileUpload}
-                    />
-
-                    {/* Upload Folder */}
-                    <label htmlFor="folder-upload" className="drop-label">
-                        <p>or click to upload folders</p>
-                    </label>
-                    <input
-                        id="folder-upload"
-                        type="file"
-                        className="file-input"
-                        webkitdirectory="true"
-                        directory="true"
-                        multiple
-                        onChange={handleFolderUpload}
-                    />
-                </div>
-            </div>
-
-            {/* File Explorer Section */}
-            <div className="file-explorer">
-                <h3>File Explorer</h3>
-                {fileStructure.items && fileStructure.items.length > 0 ? (
-                    renderFileStructure(fileStructure.items)
-                ) : (
-                    <p>No files or folders available.</p>
-                )}
-            </div>
-        </div>
-    );
+    return explorer.isFolder ? renderFolder(explorer) : <span className="file">📄 {explorer.name}</span>;
 }
 
-export default FileUploader;
+export default Folder;

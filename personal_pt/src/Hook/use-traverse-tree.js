@@ -10,15 +10,17 @@ const useTraverseTree = () => {
                 items: isFolder ? [] : null // Initialize empty items for folder, null for file
             };
 
-            // Use spread operator to create a new tree with the inserted item
-            return { ...tree, items: [newItem, ...tree.items] };
+            // Insert the new item and return the updated tree
+            return { ...tree, items: [newItem, ...(tree.items || [])] };
         }
 
         // Recursively search for the folder where the item should be inserted
-        const latestNode = tree.items.map((ob) => insertNode(ob, folderId, item, isFolder));
+        const updatedItems = tree.items
+            ? tree.items.map((ob) => insertNode(ob, folderId, item, isFolder)) // Recursively insert
+            : []; // If no items, return an empty array
 
         // Return a new tree with the updated items array
-        return { ...tree, items: latestNode };
+        return { ...tree, items: updatedItems };
     };
 
     // Function to delete a node (folder or file)
