@@ -1,0 +1,58 @@
+/* Basic styling */
+.folder {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    background-color: #f4f4f4;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+.folder:hover {
+    background-color: #e0e0e0;
+}
+
+.folder button {
+    margin-left: 5px;
+    padding: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.folder input[type="file"] {
+    display: none;
+}
+
+.folder label {
+    cursor: pointer;
+    padding: 5px;
+    font-size: 14px;
+    background-color: #5c6bc0;
+    color: white;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+.folder label:hover {
+    background-color: #3949ab;
+}
+
+.inputContainer {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.inputContainer__input {
+    padding: 5px;
+    font-size: 14px;
+    width: 200px;
+}
+
+.file {
+    margin-left: 20px;
+    font-size: 14px;
+    color: #4caf50;
+}
